@@ -3,10 +3,16 @@ import numpy as np
 from sklearn.impute import KNNImputer
 import matplotlib.pyplot as plt
 import numpy as np
+import requests
 
 def maskPrecio(df):
+    resp = requests.get("https://api.bluelytics.com.ar/v2/latest")
+    resp.raise_for_status()
+    data = resp.json()
+
+    blue_sell = data["blue"]["value_sell"]
     mask = df['Moneda'] == '$'
-    df.loc[mask, 'Precio'] = df.loc[mask, 'Precio'] / 1185
+    df.loc[mask, 'Precio'] = df.loc[mask, 'Precio'] / blue_sell
     df.drop(columns=['Moneda'], inplace=True)
     return df
 
